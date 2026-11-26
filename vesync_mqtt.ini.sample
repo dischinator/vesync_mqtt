@@ -1,0 +1,70 @@
+# Beispielkonfiguration für vesync_mqtt.py
+# Kopieren nach vesync_mqtt.ini und Zugangsdaten eintragen:
+#   cp vesync_mqtt.ini.sample vesync_mqtt.ini
+
+[vesync]
+# Zugangsdaten des VeSync-Kontos (App-Login)
+username=user@example.com
+password=geheim
+timezone=Europe/Berlin
+# Abfrageintervall der Gerätestatus in Sekunden
+polling_interval_sec=60
+# Sperrzeit in Sekunden für Statuswerte nach einem Befehl
+# (die API liefert geänderte Werte erst verzögert)
+status_lock_sec=200
+
+[mqtt]
+# Basis-Topic, z. B. vesync/<Gerätename>/<Feld> und vesync/<Gerätename>/set/<Kommando>
+base_topic=vesync
+host=mqtt.example.com
+port=8883
+username=mqttuser
+password=geheim
+# TLS mit Zertifikatsprüfung (z. B. Let's Encrypt). "host" muss dem Namen im
+# Zertifikat entsprechen (Domain statt IP), sonst schlägt die Prüfung fehl.
+# Ohne TLS: tls=false und meist port=1883
+tls=true
+# Optional: eigene CA (Default: System-CAs)
+; ca_certs=/pfad/zur/ca.pem
+
+[homeassistant]
+# MQTT Discovery für Home Assistant (die bisherigen Topics bleiben unverändert)
+enabled=true
+discovery_prefix=homeassistant
+
+[loggers]
+keys = root, VesyncToMqtt
+
+[handlers]
+keys = consoleHandler, fileHandler
+
+[formatters]
+keys = simpleFormatter
+
+[logger_root]
+level = INFO
+handlers = consoleHandler, fileHandler
+
+[logger_VesyncToMqtt]
+# DEBUG für ausführliche Ausgabe, INFO für Normalbetrieb
+level = INFO
+handlers = consoleHandler
+qualname = VesyncToMqtt
+propagate = 0
+
+[handler_consoleHandler]
+class = StreamHandler
+level = DEBUG
+formatter = simpleFormatter
+args = (sys.stdout,)
+
+# Im Container ggf. weglassen (aus handlers/keys entfernen) und nur auf stdout loggen
+[handler_fileHandler]
+class = FileHandler
+level = DEBUG
+formatter = simpleFormatter
+args = ('vesync_mqtt.log', 'a')
+
+[formatter_simpleFormatter]
+format = %(asctime)s - %(name)s - %(levelname)s - %(message)s
+datefmt = %Y-%m-%d %H:%M:%S

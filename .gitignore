@@ -1,0 +1,15 @@
+venv
+**/*.pyc
+__pycache__
+
+# Konfiguration mit Zugangsdaten
+*.ini
+
+# Testskript mit Zugangsdaten
+list.py
+
+# Logs, lokale Einstellungen
+*.log
+.claude
+.DS_Store
+.vscode

@@ -1,0 +1,30 @@
+services:
+  vesync-mqtt:
+    # Image vorher auf der Konsole bauen:
+    #   podman build -t localhost/vesync-mqtt:latest .
+    image: localhost/vesync-mqtt:latest
+    pull_policy: never           # lokales Image nutzen, nicht aus Registry ziehen
+
+    container_name: vesync_mqtt
+    restart: always # nur bei "always" startet der container automatisch beim boot
+
+    # Härtung (Podman als root)
+    user: "10001:10001"
+    read_only: true              # Root-Dateisystem schreibgeschützt
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL                      # keine Linux-Capabilities
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    mem_limit: 256m
+    cpus: 0.5
+
+    volumes:
+      # Zugangsdaten nur lesend; Datei muss für UID 10001 lesbar sein
+      - ./vesync_mqtt.ini:/app/vesync_mqtt.ini:ro
+      # Nur für Dev: Quellcode extern einbinden
+      # - ./vesync_mqtt.py:/app/vesync_mqtt.py:ro
+
+    # keine ports:, kein privileged, keinen Podman-Socket mounten
